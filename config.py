@@ -14,10 +14,10 @@ AMAP_API_KEY = os.getenv("AMAP_API_KEY")
 
 class AmapConfig:
     AMAP_API_KEY: str = os.getenv("AMAP_API_KEY")
-    MERCHANT_LONGITUDE: str = os.getenv("MERCHANT_LONGITUDE")
-    MERCHANT_LATITUDE: str = os.getenv("MERCHANT_LATITUDE")
-    DELIVERY_RADIUS: int = int(os.getenv("DELIVERY_RADIUS"))
-    DEFAULT_PATH_MODE = os.getenv("DEFAULT_PATH_MODE")
+    MERCHANT_LONGITUDE: str = os.getenv("MERCHANT_LONGITUDE", "117.282121")
+    MERCHANT_LATITUDE: str = os.getenv("MERCHANT_LATITUDE", "31.851669")
+    DELIVERY_RADIUS: int = int(os.getenv("DELIVERY_RADIUS", "2500"))
+    DEFAULT_PATH_MODE = os.getenv("DEFAULT_PATH_MODE", "1")
 
     def __post_init__(self):
         """自动调用"""

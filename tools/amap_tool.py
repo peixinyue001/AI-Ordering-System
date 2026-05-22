@@ -147,12 +147,54 @@ def calculate_distance(origin_location: str, destination_location: str, path_mod
         "success": True
     }
 
+def check_delivery_range(address: str, path_mode_input: PathInputModel = None) -> Dict[str, Any]:
+    """检查地址是否在配送范围内"""
+
+    # 1. 地址 → 经纬度
+    geocode_result = geocode_address(address)
+
+    if not geocode_result['success']:
+        return {
+            "status": "fail",
+            "message": geocode_result['message']
+        }
+
+    # 2. 拼接商家坐标（固定在配置里）
+    origin_location = f"{amap_config.MERCHANT_LONGITUDE},{amap_config.MERCHANT_LATITUDE}"
+
+    # 3. 计算两点距离
+    calculate_distance_result = calculate_distance(
+        origin_location,
+        geocode_result['location'],
+        path_mode_input or amap_config.DEFAULT_PATH_MODE
+    )
+
+    if not calculate_distance_result['success']:
+        return {
+            "status": "fail",
+            "message": calculate_distance_result['message']
+        }
+
+    # 4. 判断是否在配送范围
+    distance = calculate_distance_result['distance']
+    in_range = distance <= amap_config.DELIVERY_RADIUS
+
+    # 5. 返回结果
+    return {
+        "status": "success",
+        "in_range": in_range,
+        "distance": round(distance / 1000, 2),
+        "duration": int(calculate_distance_result['duration']),
+        "formatted_address": geocode_result['formatted_address'],
+        "message": (
+            f"配送地址：{geocode_result['formatted_address']}\n"
+            f"配送距离：{distance/1000:.2f}公里\n"
+            f"配送状态：{'在配送范围内' if in_range else '超出配送范围'}"
+        )
+    }
+
 
 
 if __name__ == "__main__":
-    result = calculate_distance(
-        origin_location="117.282121,31.851669",  # 起点经纬度
-        destination_location="117.294126,31.844542",  # 终点经纬度
-        path_mode_input="3"  # 3=驾车
-    )
-    print(result)
+    test_address = "海淀区清华大学"
+    print(check_delivery_range(test_address, '3'))
