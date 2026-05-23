@@ -4,11 +4,11 @@ from typing import List, Dict, Any
 from pinecone import Pinecone
 from pinecone import ServerlessSpec
 from http import HTTPStatus
-from db_tool import *
+from tools.db_tool import *
 from config import *
 
 
-class   PineconeVectorDB:
+class PineconeVectorDB:
     """PineCone向量数据库的操作"""
 
     def  __init__(self):
@@ -24,6 +24,7 @@ class   PineconeVectorDB:
         # 配置pinecone客户端对象以及索引对象
         self.pc = None
         self.index = None
+        self.initialize_connection()
 
 
 
@@ -264,7 +265,7 @@ def search_menu_items_with_ids(query: str, top_k: int = 2) -> Dict[str, Any]:
         re_match = re.search(r"菜品ID:(\d+)", content)
         dish_id = re_match.group(1) if re_match else item['id']
         ids.append(dish_id)
-
+    print(match_result)
     return {
         "contents": [item['content'] for item in match_result],
         "ids": ids,
@@ -272,4 +273,7 @@ def search_menu_items_with_ids(query: str, top_k: int = 2) -> Dict[str, Any]:
     }
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    result = pinecone_db.search_similar_menu_item("川菜")
+    print(result)
+
